@@ -20,7 +20,7 @@ function doPost(e) {
 
     if (event.type == 'message') {
         if (event.message.type == 'file') {
-            file_name = JSON.stringify(event.message.fileName).slice(1, -1);
+            var file_name = JSON.stringify(event.message.fileName).slice(1, -1);
             let file_id = event.message.id;
             if (file_name.includes(".xlsx")) {
                 if (fileExistsInFolder(file_name, sheet)) {
@@ -70,17 +70,19 @@ function getFileData(file_id, file_name, ACCESS_TOKEN) {
 /// <input="sheet">The active sheet</input>
 /// <returns>boolean</returns>
 function fileExistsInFolder(file_name, sheet) {
-    try {
-        const sheetData = sheet.getDataRange().getValues();
-        for (row = 3; row < sheetData.length; row++) {
-            if (sheetData[row]['B'] === file_name) {
-                return true;
-            }
+    var col = "B";
+    var row = 4;
+    var fileExists = false;
+
+    while (!sheet.getRange(col + row).isBlank()) {
+        if (sheet.getRange(col + row).getValue() === file_name) {
+            fileExists = true;
+            break;
         }
-        return false;
-    } catch (e) {
-        return false;
+        row += 1;
     }
+
+    return fileExists;
 }
 
 /// <summary>
